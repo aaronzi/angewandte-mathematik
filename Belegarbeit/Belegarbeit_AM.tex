@@ -1,0 +1,310 @@
+%--------------------------------------------------------------------------
+% Dokumentenklasse
+%--------------------------------------------------------------------------
+
+% disable Warning for remreset Package
+\RequirePackage{silence}
+\WarningFilter{remreset}{The remreset package}
+
+\documentclass[
+	pagesize,
+	fontsize=12pt,
+	paper=a4,
+	oneside,
+   reqno
+]{scrartcl}
+
+%--------------------------------------------------------------------------
+% Standartpackete 
+%--------------------------------------------------------------------------
+\usepackage[ngerman]{babel}               % Deutsch Silbentrennung
+\usepackage[T1]{fontenc}                  % Font Type
+\usepackage[utf8]{inputenc}               % Font Encoding
+\usepackage{lmodern}                      % Latin Modern Font
+\usepackage{csquotes}                     % Setzen von Zitaten
+\usepackage{xspace}                       % setzten von Leerzeichen nach Abkürzungen
+\usepackage{microtype}                    % für glättere Seitenränder
+\renewcommand*\familydefault{\sfdefault}  % Serifenlose Schrift
+%\renewcommand*\familydefault{\ttdefault} % Schreibmaschinenschrift
+
+%--------------------------------------------------------------------------
+% Extra Packages
+%--------------------------------------------------------------------------
+
+% Abkürzungspaket
+\usepackage{acronym}
+
+% Mathe Pakete
+\usepackage{amsmath}
+\usepackage{thmtools}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{gensymb}
+
+% Listenumgebungen
+\usepackage{listings}
+\usepackage{paralist}
+\usepackage{enumitem}
+\usepackage{adjustbox}
+
+% Demo Text
+\usepackage{blindtext}
+
+% Farb-Pakete
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage{colortbl}
+
+% Farbedefinitionen
+\definecolor{htw}{RGB}{120, 184, 2}
+\definecolor{ccW}{RGB}{255,255,255}
+\definecolor{ccR}{RGB}{197,14,31}
+\definecolor{ccG}{RGB}{113,113,113}
+\definecolor{ccL}{RGB}{220,220,220}
+\definecolor{ccS}{RGB}{0,0,0}
+\definecolor{ccB}{RGB}{68,73,159}
+\definecolor{ccD}{RGB}{0,0,80}
+
+% Für erweiterte Tabellen
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{makecell}
+% \setlength{\tabcolsep}{0.5em}       % for the horizontal padding
+% {\renewcommand{\arraystretch}{1.8}  % for the vertical padding
+% \usepackage{ragged2e}
+% \newcolumntype{R}[1]{>{\RaggedRight}p{#1}}
+
+% Einheitenpaket
+\usepackage[exponent-product = \cdot]{siunitx}
+\sisetup{locale=DE}
+
+\makeatletter
+\renewcommand\@dotsep{5}
+\makeatother
+
+% Pakete für Grafiken
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{overpic}
+\usepackage{epstopdf}
+\usepackage{caption}
+\usepackage{subcaption}
+% \captionsetup[subfigure]{list=true, font=normalsize, labelformat=brace, position=top} %setup für subfigure captions
+
+% Diagramm-/Grafikerstellung
+\usepackage{pstricks}
+\usepackage{tikz}
+\usetikzlibrary{math}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.5}
+\usetikzlibrary{intersections,positioning,arrows,automata,calc,patterns,shapes.multipart,fit,backgrounds,decorations.pathreplacing}
+\usetikzlibrary{decorations,shapes.geometric}
+\usetikzlibrary{matrix,calc,angles,positioning,quotes}
+% \usepackage{tikz-uml}
+
+\usepackage{pgfkeys}
+\usepackage{pgfopts}
+\usepackage{ifthen}
+\usepackage{xstring}
+\usepackage{calc}
+\usepackage{pst-plot,pst-bar,pst-node} % Balkendiagramme
+\usepackage{capt-of}
+\usepackage{incgraph} % Fullscreen Images
+\usepackage{pdfpages} % Include external pdf pages
+
+\usepackage{latexsym}
+\usepackage{censor}
+\usepackage{here}
+% \StopCensoring        % Auskommentiert wird der Text entschwaerzt 
+% \censor{Oszilloskop}  % Befehl zum einschwärzen
+\usepackage{trfsigns}   % Transformation Symbol o---o \laplace and \Laplace
+\usepackage{circuitikz}
+
+\usepackage{multido}
+
+% Verlinkungen im Text
+\usepackage{url}
+\usepackage{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\hypersetup{hidelinks}
+\urlstyle{same}
+
+%--------------------------------------------------------------------------
+% Eigene Befehle
+%--------------------------------------------------------------------------
+
+% \renewcommand{\thesection}{\arabic{section}} % Section startet mit 1.0 und nicht mit 0.1
+
+%------------sectioning command-------------------
+% The sectioning command one level down the hierarchy from \subsubsection is called \paragraph followed by \subparagraph
+% to include this in your table of contents
+
+% for paragraph
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
+% for subparagraph
+\setcounter{tocdepth}{5}
+\setcounter{secnumdepth}{5}
+
+%------------Zitate-------------------------------
+\newcommand*{\zitat}[2]{%
+   \normalfont\small
+   \begin{quote}
+   \glqq#1\grqq \par
+   #2
+   \end{quote}
+   \normalsize
+}
+\newcommand*{\zitatmitueberschrift}[3]{%
+   \normalfont\small
+   \begin{quote} #3
+   \glqq#1\grqq \par
+   #2
+   \end{quote}
+   \normalsize
+}
+\newcommand*{\zitext}[2]{%
+   \glqq#1\grqq\ %
+   [#2]%
+}
+
+%-----------Seitendesign--------------------------
+\usepackage[width=15.5cm, height=23cm, includeheadfoot]{geometry}
+\geometry{paper=a4paper}
+% \usepackage[left=6cm,right=1cm,top=1.5cm, bottom=1cm, includeheadfoot]{geometry}
+% \newgeometry{oneside}
+% \setlength{\voffset}{0cm}
+\setlength{\headheight}{1.1\baselineskip} % increase headheight
+\setlength{\footheight}{28.99998pt}       % increase foodheight
+\setlength{\parindent}{0cm}               % Einrücken nach \newline
+\setlength{\footskip}{86pt}               % Move Footer down
+% \setlength{\topmargin}{0cm}
+% \setlength{\marginparsep}{0.5cm}
+% \setlength{\marginparwidth}{1.5cm}
+% \setlength{\textwidth}{16cm}
+% \setlength{\textheight}{23cm}
+% \setlength{\oddsidemargin}{1cm}
+% \setlength{\evensidemargin}{2cm}
+
+%----------Kopf & Fußzeile------------------------
+% \usepackage[headsepline,footsepline]{scrpage2}
+\usepackage[headsepline]{scrlayer-scrpage}
+\pagestyle{scrheadings}
+\clearpairofpagestyles
+\ihead{\headmark}
+\automark{section}
+\chead{}
+\ohead{\includegraphics[scale=0.09]{Bilder/HTWLogoKopfzeile.png} \nocite{HTWklein}}
+\ifoot{Aaron Zielstorff\\ 567183}
+\cfoot{\pagemark}
+\ofoot{M1 Angewandte Mathematik}
+
+%--------------------------------------------------------------------------
+% Beginn des Dokuments
+%--------------------------------------------------------------------------
+\begin{document}
+
+%----------Deckblatt----------------------------- 
+\begin{titlepage}
+   \pagestyle{empty} % setzt Pagestyle-Befehl
+
+   % HTW Logo
+   \begin{flushright}
+   \includegraphics[scale=.07]{Bilder/LogoHTWBerlin.png}  \nocite{HTWgross}
+   \end{flushright}
+
+   \vspace{1cm}
+
+   % Titel
+   \begin{center}
+      \Huge{\textbf{Projekt Zeitaufgelöste Photolumineszenz: 
+      Angewandte Mathematik (M1)}} \\
+   \end{center}
+
+   \vspace{3cm}
+
+   % Name
+   \begin{flushleft}
+      \begin{tabular}{l l}
+         \textbf{Name:}    & Aaron Zielstorff   \\
+         \textbf{Mtr.Nr.:} & 567183             \\
+      \end{tabular}
+   \end{flushleft}
+
+   \vspace{1cm}
+
+   % Daten
+   \begin{tabular}{l l}
+      \textbf{Fachbereich:}   & FB1                                              \\
+      \textbf{Studiengang:}   & M.\xspace Elektrotechnik                         \\
+      \textbf{Fachsemester:}  & 1.\xspace FS                                     \\
+      \textbf{Fach:}          & M1 Angewandte Mathematik                         \\
+      \textbf{Dozent:}        & Prof.\xspace Dr.\xspace A.\xspace Zeiser         \\
+      \textbf{Abgabe am:}     & 20.\xspace März 2022                             \\ 
+   \end{tabular}
+\end{titlepage}
+\clearpage
+
+%--------Inhaltsverzeichnis-----------------------
+\renewcommand{\contentsname}{Inhaltsverzeichnis}
+\tableofcontents
+\clearpage
+
+%--------Abbildungsverzeichnis--------------------
+\renewcommand{\listfigurename}{Abbildungsverzeichnis}
+\renewcommand*{\figurename}{Abb.}
+\listoffigures
+% \clearpage
+
+%--------Tabellenverzeichnis----------------------
+\renewcommand*{\listtablename}{Tabellenverzeichnis}
+\renewcommand*{\tablename}{Tab.}
+\listoftables
+\clearpage
+
+
+%---------Kapitel/Text----------------------------
+
+
+
+%---------Quellen---------------------------------
+\newpage
+\newcount\Quellennummer
+\Quellennummer=1
+
+\renewcommand\refname{Literaturverzeichnis}
+\addcontentsline{toc}{section}{Literaturverzeichnis}
+
+\begin{thebibliography}{999}
+{\setlength{\emergencystretch}{3cm}%
+
+\bibitem[\the\Quellennummer]{HTWgross}
+HTW-Logo auf dem Deckblatt\par
+\url{https://de.wikipedia.org/wiki/Datei:Logo_HTW_Berlin.svg} \par
+ Stand: 17.08.2018 um 14:49 Uhr
+
+\advance\Quellennummer by 1
+ 
+\bibitem[\the\Quellennummer]{HTWklein}
+HTW-Logo in der Kopfzeile\par
+\url{http://tonkollektiv-htw.de/} \par
+ Stand: 17.08.2018 um 14:53 Uhr
+
+\advance\Quellennummer by 1
+
+\bibitem[\the\Quellennummer]{RannebergScript}
+Vorlesungsskript-Ranneberg (2014): LE\_Modul\_M11\_B6-Brücke\par
+
+\advance\Quellennummer by 1
+
+\bibitem[\the\Quellennummer]{RannebergLaboranleitung}
+Versuchsanleitung-Ranneberg (2021): Simulationsübung
+Leistungselektronik (M8 PCÜ)\par
+
+}
+\end{thebibliography}
+
+\end{document}
