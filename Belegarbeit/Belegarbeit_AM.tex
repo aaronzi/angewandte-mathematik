@@ -364,7 +364,125 @@ mit $k = k_1 + k_2N_D$. Die Randbedingungen sind weiterhin durch \autoref{eq:eq5
 
 Die Behandlung der stationären Gleichung erfolgt ähnlich zu der in [4, Abschnitt 8.8] beschriebenen Methode. Jedoch werden die Randbedingungen unterschiedlich behandelt. Folgende Aufgaben wurden bearbeitet.
 
-\subsubsection{Vorgehen aus [4, Abschnitt 8.8] angewendet auf \autoref{eq:eq6}}
+\subsubsection{Methode aus [4, Abschnitt 8.8] für Anwendung auf \autoref{eq:eq6}}
+
+Die beschriebene Methode der finiten Differenzen für Zweipunkt-Randwertprobleme ermöglicht die Lösung von linearen Differenzialgleichungen zweiter Ordnung. Die Grundlage der finiten Differenzen Methode ist das Aufstellen von diskreten Gleichungen durch das Substituieren der Ableitungen mit geeigneten finiten Differenzen. Das Ergebnis ist eine Matrix, mit der in unserem konkreten Beispiel die zeitabhängige Stelle der Ladungsträgerdichte $u_i$ mathematisch beschrieben werden kann. \\
+
+Für die beschriebene Methode sind drei Schritte notwendig:
+
+\begin{enumerate}
+   \item Diskretisierung des Bereiches $z \in [0, d]$ in $M$ gleich große Intervalle der Länge $h$ mit $h = \frac{d-0}{N}$.
+   \item Diskretisierung der Differenzialgleichung an den Knotenpunkten $u_1, ... , u_{N-1}$ mit den Approximationen der Ableitungen.
+   \item Diskretisierung der Randbedingungen und Aufstellen des Gleichungssystems durch die Elimination von $u_{-1}$ und $u_{N+1}$.
+\end{enumerate}
+
+\subsubsection{Herleitung der Gleichung für die gesuchten Werte $u_0, ... , u_{N}$}
+
+Approximation der 1. Ableitung:
+
+\begin{align*}
+   \frac{\partial u}{\partial z} = \frac{u_{i+1}-u_{i-1}}{2h}
+\end{align*}
+
+Approximation der 2. Ableitung:
+
+\begin{align*}
+   \frac{\partial^2 u}{\partial z^2} = \frac{u_{i+1}-2\cdot u_i+u_{i-1}}{h^2}
+\end{align*}
+
+Duch das Einsetzen der Approximationen der beiden Ableitungen ergeben sich für $u_i$ mit $i=0, ... ,N$ unter der der Festlegung $s_i = s(z_i)$ und $u_i \approx u(z_i)$ folgende Gleichungen:
+
+\begin{align*}
+   D\cdot \frac{u_1-2\cdot u_0+\textcolor{blue}{u_{-1}}}{h^2} - k\cdot u_0 &= -s_0 \quad mit \quad i = 0 \\
+   D\cdot \frac{u_{i+1}-2\cdot u_i+u_{i-1}}{h^2} - k\cdot u_i &= -s_i \\
+   D\cdot \frac{\textcolor{blue}{u_{N+1}}-2\cdot u_N+u_{N-1}}{h^2} - k\cdot u_N &= -s_N \quad mit \quad i = N \\
+\end{align*}
+
+Dabei ist $u_i$ die approximierte Ladungsträgerdichte an der Stelle $z_i$ und $s_i$ die Ladungsträgerdichte, die durch die Bestrahlung mit dem Laser an der Stelle $z_i$ auftritt. \\
+
+\subsubsection{Approximation der Ableitungen an den Randbedingungen}
+
+Zunächst werden die ersten Ableitungen an den Randbedingungen (\autoref{eq:eq5}) approximiert durch:
+
+\begin{align*}
+   u'(0) \approx \frac{u_1-u_{-1}}{2h}, \quad u'(d) \approx \frac{u_{N+1}-u_{N-1}}{2h}
+\end{align*}
+
+Durch das Auflösen nach $u_{-1}$ bzw. $u_{N+1}$ ergibt sich:
+
+\begin{align*}
+   u_{-1} = -(u'(0)\cdot 2h) + u_1, \quad u_{N+1} = u'(d)\cdot 2h + u_{N-1}
+\end{align*}
+
+Einsetzen an den Knoten $z_0$ und $z_N$ ergibt:
+
+\begin{align*}
+   D*\frac{u_1-2u_0-(u'_0\cdot 2h)+u_1}{h^2} - k\cdot u_0 &= -s_0 \quad mit \quad i = 0 \\
+   D*\frac{u'_N\cdot 2h+u_{N-1}-2u_N+u_{N-1}}{h^2} - k\cdot u_N &= -s_N \quad mit \quad i = N \\
+\end{align*}
+
+Die Gleichungen an den Stellen $i=0, i, N$ werden nun vereinfacht bzw. umgeformt:
+
+\begin{align*}
+   \frac{D}{h^2}\cdot \left[ \textcolor{green}{2}u_1-\left( \textcolor{green}{2+\frac{s_L\cdot 2h}{D}+\frac{h^2\cdot k}{D}}\right) \cdot u_0\right] &= -s_0 \quad mit \quad i = 0 \\
+   \frac{D}{h^2}\cdot \left[ \textcolor{green}{1}u_{i+1}-\left( \textcolor{green}{2+\frac{h^2\cdot k}{D}}\right) \cdot u_i+\textcolor{green}{1}u_{i-1}\right] &= -s_i \\
+   \frac{D}{h^2}\cdot \left[ \left( \textcolor{green}{\frac{-s_R\cdot 2h}{D}-2-\frac{h^2\cdot k}{D}}\right) \cdot u_N+\textcolor{green}{2}u_{N-1}\right] &= -s_N \quad mit \quad i = N \\
+\end{align*}
+
+\subsubsection{Aufstellen des linearen Gleichungssystems}
+
+Aus den soeben Aufgestellten Gleichungen bzw. den grün eingefärbten Termen wird für die Größen $u_0, ... , u_{N}$ analog zu [4, 8.133] das lineare Gleichungssystem aufgestellt. Dabei soll das Gleichungssystem folgende Form aufweisen:
+
+\begin{align}
+   \label{eq:eq7}
+   Au = b, \quad u = [u_i], \quad b = [b_i]
+\end{align}
+
+Die Gleichungen werden analog zu den Knotenpunkten $z_0, ... , z_N$ geordnet. \\
+
+Für die Koeffizientenmatrix ergibt sich:
+
+\begin{align*}
+   A &= \frac{D}{h^2}\cdot
+   \begin{bmatrix*}
+      \left( 2+\frac{s_L\cdot 2h}{D}+\frac{h^2\cdot k}{D}\right)  & 2 \\
+                     1                                            & \left( 2+\frac{h^2\cdot k}{D}\right) & 1 \\
+                                                                  & \ddots                               & \ddots & \ddots \\
+                                                                                                         &        & 1   & \left( 2+\frac{h^2\cdot k}{D}\right) & 1 \\
+                                                                                                         &        &     & 2                                    & \left( \frac{-s_R\cdot 2h}{D}-2-\frac{h^2\cdot k}{D}\right)
+   \end{bmatrix*}
+   \cdot
+   \begin{bmatrix*}
+      u_0 \\
+      u_1 \\
+      \vdots \\
+      u_{N-1} \\
+      u_N
+   \end{bmatrix*}
+   \\
+   A &= -
+   \begin{bmatrix*}
+      s_0 \\
+      s_1 \\
+      \vdots \\
+      s_{N-1} \\
+      s_N
+   \end{bmatrix*}
+\end{align*}
+
+\subsubsection{Matlab Routine zum Berechnen der Matrix $A$}
+
+Die Routine kann unter dem Dokumentennamen \texttt{fd\_lin\_matrix.m} gefunden werden im beigefügten Ordner.
+
+\subsubsection{Matlab Routine zum Lösen des Gleichungssystems (\autoref{eq:eq7})}
+
+Die Routine kann unter dem Dokumentennamen \texttt{stationär\_lin.m} gefunden werden im beigefügten Ordner.
+
+\subsubsection{Testen der Matlab Routine}
+
+
+
+\subsubsection{Anwendung der Routine auf spezielle Fälle}
 
 
 
