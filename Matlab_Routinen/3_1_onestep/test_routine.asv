@@ -1,6 +1,6 @@
-y = @(t) exp(-t).*sin(t); % Vorgabe einer Loesung
-dy = @(t) exp(-t).*cos(t)-exp(-t).*sin(t); % 1. Ableitung der Loesung 
-dy2 = @(t) exp(-t).*cos(t).*-2.0; % 2. Ableitung der Loesung
+y = @(t) exp(-t).*sin(t); % Vorgabe einer Lösung
+dy = @(t) exp(-t).*cos(t)-exp(-t).*sin(t); % 1. Ableitung der Lösung 
+dy2 = @(t) exp(-t).*cos(t).*-2.0; % 2. Ableitung der Lösung
 
 % Konstruktion der DGL
 omega0 = 3;
@@ -21,7 +21,7 @@ nmax = 10;
 te = 0:0.1:10;
 se = [y(te);dy(te)];
 plot(t,s, '-o',te,se, 'Linewidth', 3)
-legend('FD Loesung', 'FD L�esung', 'Analytisch', 'Analytisch')
+legend('FD Lösung', 'FD Lösung', 'Analytisch', 'Analytisch')
 grid on
 xlabel('Zeit t');
 ylabel('Funktionswert y');

@@ -807,9 +807,296 @@ Die genutzte Matlab Routine zum Testen der Routine kann unter dem Dokumentenname
 
 \subsubsection{Anwendung der Routine auf spezielle Fälle}
 
+In dieser Teilaufgabe soll mit der entwickelten Routine die Lösung für die Fälle
+
+\begin{align*}
+   s(z) = S_0 \cdot e^{-\alpha z}, \quad S_0 = 10^2, 10^3, 10^4 \frac{1}{\mu m^3 \mu s}
+\end{align*}
+
+berechnet werden. Weiterhin soll ein geeignetes $N$ so bestimmt werden, dass der relative Fehler in $u_i$ maximal 1\textperthousand{} beträgt. \\
+
+Das Ergebnis für die drei Fälle von $S_0$ ist in \autoref{fig:Aufgabe_2_2_7} zu erkennen.
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Bilder/Aufgabe_2_2_7.png}
+   \caption[Lösung von $s(z)$]{Lösung von $s(z)$ für verschiedene $S_0$}
+   \label{fig:Aufgabe_2_2_7}
+\end{figure}
+
+Um ein geeignetes $N$ zu bestimmen, um den realtiven Fehler zu erreichen, wird das $N$ in einer Schleife iterativ erhöht. Dabei wird der Fehler relativ zum vorherigen $N$ berechnet. Das ergebnis dieser Routine wird in \autoref{fig:Aufgabe_2_2_7_b} dargestellt. \\
+Die Routine kann unter dem Dokumentennamen \texttt{exper\_stationär\_nonlin.m} gefunden werden im beigefügten Ordner. Es kann festgehalten werden, dass das $N$ als 512 gewählt werden muss, um einen relativen Fehler in $u_i$ von maximal 1\textperthousand{} zu erreichen.
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Bilder/Aufgabe_2_2_7_b.png}
+   \caption[Experimentelle Ermittlung von $N$]{Experimentelle Ermittlung von $N$, so dass der relative Fehler in $u_i$ maximal $10^{-3}$ beträgt}
+   \label{fig:Aufgabe_2_2_7_b}
+\end{figure}
+
+Beim Vergleich von \autoref{fig:Aufgabe_2_1_8} und \autoref{fig:Aufgabe_2_2_7} kann festgestellt werden, dass die Lösung für alle Fälle gleich scheinen. Auch die experimentelle Bestimmung eines geeigneten $N$ ist gibt sowohl für den linearen, als auch für den nichtlinearen Fall den selben Wert ($N = 512$) zurück.
+
 \clearpage
 
 \section{Implizite Einschrittverfahren} \label{sec:ImpliziteEinschrittverfahren}
+
+In diesem Abschnitt sollen Löser für Systeme von sogenannten steifen Anfangswertproblemen untersucht werden. In \autoref{sec:ZeitaufgeloesteSimulation} wird die partielle Differenzialgleichung \autoref{eq:eq1} mithilfe der finiten Differenzen des letzten Abschnitts näherungsweise als ein System von Anfangswertproblemen formuliert, das sich steif verhält. \\
+
+Steife Systeme treten aber auch in der Modellierung von Reaktionen in der Chemie auf. Als Beispiel soll eine chemische Reaktion dreier Stoffe $A, B, C$ aus [5] dienen:
+
+\begin{align*}
+   A \rightarrow B, \quad B +B \rightarrow C + B, \quad B + C \rightarrow A + C
+\end{align*}
+
+Die Dynamik der Konzentrationen der einzelnen Komponenten können durch Anfangswertproblem
+
+\begin{align}
+   \begin{matrix*}
+      A: & y'_1 & = & -0.04y_1   & +10^4y_2y_3                       \\
+      B: & y'_2 & = & +0.04y_1   & -10^4y_2y_3  & -3 \cdot 10^7y_2^2 \\
+      C: & y'_3 & = &            &              & +3 \cdot 10^7y_2^2
+   \end{matrix*}
+\end{align}
+
+mit den Anfangswerten
+
+\begin{align}
+   y_1(0) = 1, \quad y_2(0) = 0, \quad y_3(0) = 0
+\end{align}
+
+modelliert werden. Anhand dieses Systems sollen im folgenden steife Differenzialgleichungen untersucht und ein effizientes numerisches Verfahren entwickelt werden.
+
+\subsection{Entwicklung}
+
+Ein allgemeines System von Anfangswertproblemen für eine Funktion $y : \mathbb{R} \to \mathbb{R} ^k$ kann in der Form
+
+\begin{align}
+   \label{eq:eq11}
+   y' = f(t,y), \quad t \in [a,b], \quad y(a) = y_a
+\end{align}
+
+geschrieben werden. Wie in der Vorlesung wird zur näherungsweisen numerischen Lösung das Intervall $[a,b]$ in $n$ gleich große Teilintervalle der Länge $h$ aufgeteilt mit Knoten $a = t_0 < t_1 < ... < t_n = b$. Der Wert von $y$ wird näherungsweise an diesen Zeitpunkten berechnet:
+
+\begin{align*}
+   y^{(i)} \approx y(t_i), \quad i = 0, 1, ..., N.
+\end{align*}
+
+Für die Berechnung der Werte $y(i)$ sollen implizite Einschrittverfahren wie in [3, Abschnitt 8.4] verwendet werden. Insbesondere das implizite Euler-Verfahren [3, Gleichung (8.51)]
+
+\begin{align}
+   \label{eq:eq12}
+   y^{(i+1)} = y^{(i)} + hf(t_{i+1},y^{(i+1)})
+\end{align}
+
+und die implizite Trapezregel [3, Gleichung (8.57)]
+
+\begin{align}
+   \label{eq:eq13}
+   y^{(i+1)} = y^{(i)} + \frac{h}{2}\left[ f(t_{i},y^{(i)}) + f(t_{i+1},y^{(i+1)}) \right]
+\end{align}
+
+Im Unterschied zu [3] soll die Lösung der auftretenden nichtlinearen Gleichungssystemen nicht mithilfe der Fixpunktiteration sondern mit dem Newton-Verfahren aus der Belegarbeit näherungsweise bestimmt werden. \\
+
+Dazu wird wie folgt vorgegangen.
+
+\subsubsection{Steife Differenzialgleichungen}
+
+Unter steifen Differenzialgleichungen versteht man Differenzialgleichungen, für welche bestimmte numerische Methoden zum Lösen der Gleichung instabil sind, wenn die Schrittweite nicht extrem klein gewählt wird. Es existieren Differnzialgleichungen, welche Terme besitzen, die zu starken Variationen in der Lösung führen.
+
+\subsubsection{Implizite Verfahren als Nullstellenproblem}
+
+In den Gleichungen des impliziten Euler-Verfahrens und der impliziten Trapezregel (\autoref{eq:eq12} und \autoref{eq:eq13}) wird
+
+\begin{align*}
+   y^{(i+1)} = y^{(i)} + z
+\end{align*}
+
+gesetzt. Wir erhalten die folgenden Gleichungen für die beiden Verfahren:
+
+\begin{align*}
+   Euler: \quad y^{(i)} + z &= y^{(i)} + hf(t_{i+1},y^{(i)} + z) \\
+   Trapez: \quad y^{(i)} + z &= y^{(i)} + \frac{h}{2}\left[ f(t_{i},y^{(i)}) + f(t_{i+1},y^{(i)} + z) \right] \\
+\end{align*}
+
+Anschließend wird jeweils die Gleichung für $z$ als Nullstellenproblem formuliert:
+
+\begin{align*}
+   F_{euler}(z) = 0, \quad F_{trapez}(z) = 0
+\end{align*}
+
+Es ergeben sich die folgenden Nullstellenprobleme:
+
+\begin{align*}
+   F_{euler}(z) &= z - hf(t_{i+1},y^{(i)} + z) = 0 \\
+   F_{trapez}(z) &= z - \frac{h}{2}\left[ f(t_{i},y^{(i)}) + f(t_{i+1},y^{(i)} + z) \right] = 0 \\
+\end{align*}
+
+\subsubsection{Jacobi-Matrizen $DF_{euler}$ und $DF_{trapez}$}
+
+Für beide Verfahren soll aus den Gleichungen $F_{euler}(z)$ und $F_{trapez}(z)$ die Jacobi-Matrizen $DF_{euler}$ und $DF_{trapez}$ bestimmt werden in Abhängigkeit von $D_yf$ (der Jacobi-Matrix von $f$ bezüglich $y$).\\
+
+Für das implizite Euler-Verfahren ergibt sich:
+
+\begin{align*}
+   DF_{euler}(z) = D \cdot z - D_yf(t_{i+1},y^{(i)} + z)
+\end{align*}
+
+Für die implizite Trapezregel ergibt sich:
+
+\begin{align*}
+   DF_{trapez}(z) = \frac{h}{2}\left[ D_yf(t_{i},y^{(i)}) + h \cdot D_yf(t_{i+1},y^{(i)} + z) \right] - D \cdot z
+\end{align*}
+
+Dabei gilt:
+
+\begin{align*}
+   Df =
+   \begin{bmatrix*}
+      \frac{\partial f_1}{\partial y_1} & \frac{\partial f_1}{\partial y_2} & \cdots & \frac{\partial f_1}{\partial y_n} \\
+      \frac{\partial f_2}{\partial y_1} & \frac{\partial f_2}{\partial y_2} & \cdots & \frac{\partial f_2}{\partial y_n} \\
+      \vdots & \vdots & \ddots & \vdots \\
+      \frac{\partial f_n}{\partial y_1} & \frac{\partial f_n}{\partial y_2} & \cdots & \frac{\partial f_n}{\partial y_n}
+   \end{bmatrix*}
+\end{align*}
+
+Weiterhin gilt auch:
+
+\begin{align*}
+   Df =
+   \begin{bmatrix*}
+      1 & 0 & \cdots & 0 \\
+      0 & 1 & \cdots & 0 \\
+      \vdots & \vdots & \ddots & \vdots \\
+      0 & \cdots & 0 & 1
+   \end{bmatrix*}
+\end{align*}
+
+\subsubsection{Matlab Routinenen zur Umsetzung der letzten beiden Teilaufgaben}
+
+Die Routinen können unter den Dokumentennamen \texttt{F\_euler.m} und \texttt{F\_trapez.m} gefunden werden im beigefügten Ordner.
+
+\subsubsection{Löser zu den beiden Verfahren mit Matlab}
+
+Die Löser können unter den Dokumentennamen \texttt{impl\_euler.m} und \texttt{impl\_trapez.m} gefunden werden im beigefügten Ordner.
+
+\subsubsection{Ermittlung der Ordnung der Verfahren}
+
+Die Ermittlung der Ordnung erfolgt anhand des Beispiels
+
+\begin{align*}
+   y' = -y
+\end{align*}
+
+mit der Anfangsbedingung
+
+\begin{align*}
+   y(0) = 1
+\end{align*}
+
+auf dem Intervall
+
+\begin{align*}
+   t_{span} = [0,1].
+\end{align*}
+
+Zunächst wird Differenzialgleichung und deren Ableitung aufgestellt:
+
+\begin{align*}
+   f(t,y) = -y \\
+   f'(t,y) = -1
+\end{align*}
+
+Weiterhin ist die exakte Lösung bekannt:
+
+\begin{align*}
+   y = e^{-t}
+\end{align*}
+
+In einer Schleife kann nun die Schrittweite iterativ erhöht werden, um die Ordnung der beiden Verfahren grafisch zu ermitteln. \autoref{fig:Aufgabe_3_1_6} und \autoref{fig:Aufgabe_3_1_6_b} zeigen die Ergebnisse. Es ist zu erkennen, dass das implizite Euler-Verfahren eine Ordnung von $1$ hat und die implizite Trapezregel eine Ordnung von $2$.\\
+Die Matlab-Scripte können unte den Dokumentennamen \texttt{ordnung\_impl\_euler.m} und \texttt{ordnung\_impl\_trapez.m} gefunden werden im beigefügten Ordner.
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=0.9\textwidth]{Bilder/Aufgabe_3_1_6.png}
+   \caption[Ordnung impl. Euler-Verfahren]{Grafische Bestimmung der Ordnung des impliziten Euler-Verfahrens}
+   \label{fig:Aufgabe_3_1_6}
+\end{figure}
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=0.9\textwidth]{Bilder/Aufgabe_3_1_6_b.png}
+   \caption[Ordnung impl. Trapezregel]{Grafische Bestimmung der Ordnung der impliziten Trapezregel}
+   \label{fig:Aufgabe_3_1_6_b}
+\end{figure}
+
+\subsubsection{Test der Routine}
+
+Zum Testen der Routine wird eine Lösung und die ersten beiden Ableitungen dieser vorgegeben.
+
+\begin{align*}
+   y(t) &= e^{-t} \cdot sin(t) \\
+   y'(t) &= e^{-t} \cdot cos(t) - e^{-t} \cdot sin(t) \\
+   y''(t) &= -2 \cdot e^{-t} \cdot cos(t)
+\end{align*}
+
+Nachfolgend wird eine Differenzialgleichung aufgestellt, die ein System nichtlinearer, zeitabhängiger Anfangswertprobleme beschreibt:
+
+\begin{align*}
+   r = y'' + t \cdot y + \omega _0^2 \cdot (y - \frac{1}{6} y^3)
+\end{align*}
+
+Nun muss eine rechte Seite ermittelt werden, die für die vorgegebene Lösung passend ist. Dazu wird zunächst ein Spaltenvektor aus der Lösung und deren 1. Ableitung gebildet als Funktionshandle abhängig von $t$ und $z$.
+
+\begin{align*}
+   z(t,z) =
+   \begin{bmatrix*}
+      y(t) \\
+      y'(t)
+   \end{bmatrix*}
+\end{align*}
+
+Nachfolgend wird die Ableitung dieses Vektors bestimmt. Die erste Zeile enthält nun die 1. Ableitung von $y$. Die zweite Zeile enthält die 2. Ableitung von $y$. Durch das Umstellen der Differenzialgleichung $r$ nach $y''$ kann nun wie folgt eingesetzt werden:
+
+\begin{align*}
+   f_z(t,z) =
+   \begin{bmatrix*}
+      y'(t) \\
+      r(t) - \left( t \cdot y'(t) + \omega _0^2 \cdot \left( y(t) - \frac{1}{6} \cdot y(t)^3\right) \right)
+   \end{bmatrix*}
+\end{align*}
+
+Da das Newton-Verfahren auch die Ableitung dieses Vektors benötigt, muss im nächsten Schritt die Jacobi-Matrix berechnet werden.
+
+\begin{align*}
+   Df_z(t,z) =
+   \begin{bmatrix*}
+      0                                            & 1 \\
+      -\omega _0 + \omega _0 \cdot 3 \cdot z_1^2  & -t
+   \end{bmatrix*}
+\end{align*}
+
+Abschließend wird der Startwert ermittelt.
+
+\begin{align*}
+   z_0 =
+   \begin{bmatrix*}
+      y(0) \\
+      y'(0)
+   \end{bmatrix*}
+\end{align*}
+
+Nun können die berechneten Gleichungen als Parameter in der Matlab Routine für die implizite Trapezregel eingesetzt werden. Das Ergebnis ist in \autoref{fig:Aufgabe_3_1_7} dargestellt. \\
+
+Das Matlab-Sckript mit dem Test der Routine kann unter dem Dokumentennamen \texttt{test\_routine.m} gefunden werden im beigefügten Ordner.
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Bilder/Aufgabe_3_1_7.png}
+   \caption[Test der Routine]{Test der Routine mit einem nichtlinearen, zeitabhängigen System von Anfangswertproblemen}
+   \label{fig:Aufgabe_3_1_7}
+\end{figure}
+
+\subsection{Anwendung}
 
 \clearpage
 
@@ -849,6 +1136,11 @@ Baloch, Ahmer A. B. \textit{et al:} \glqq Analysis of Photocarrier Dynamics at I
 
 \bibitem[\the\Quellennummer]{NumericalAnalysis}
 Atkinson, Kendall E. und Han, Weimin: \glqq Elementary Numerical Analysis\grqq{}, J. Wiley \& Sons, Hoboken, NJ (2004).
+
+\advance\Quellennummer by 1
+
+\bibitem[\the\Quellennummer]{StiffDifferentialProblems}
+Hairer, Ernst und Wanner, Gerhard: \glqq Solving Ordinary Differential Equations II. Stiff and Differential-Algebraic Problems\grqq{}, Springer, Berlin (1991).
 
 \advance\Quellennummer by 1
 

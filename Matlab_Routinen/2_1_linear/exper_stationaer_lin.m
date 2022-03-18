@@ -26,7 +26,7 @@ legendString = sprintf('N =  %.0f',Nresult);
 legend(legendString);
 grid on
 xlabel('Anzahl der Teilintervalle');
-ylabel('max. abs. Fehler [um]');
+ylabel('Rel. Fehler in u_i');
 
 %% Berechnung der F�lle f�r S_0 = 10^2, 10^3 und 10^4
 
@@ -47,4 +47,4 @@ legend('S_0 = 10^2', 'S_0 = 10^2', 'S_0 = 10^2')
 grid on
 xlabel('z [um]');
 ylabel('u [1]');
-title('L�sungen von s(z) bei verschiedenen S_0');
+% title('L�sungen von s(z) bei verschiedenen S_0');
