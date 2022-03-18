@@ -480,11 +480,97 @@ Die Routine kann unter dem Dokumentennamen \texttt{stationär\_lin.m} gefunden w
 
 \subsubsection{Testen der Matlab Routine}
 
+Zum Testen der Routine wir eine Funktion $u(z)$ wie folgt vorgegeben:
 
+\begin{align*}
+   u(z) = a \cdot e^{\lambda z}
+\end{align*}
+
+Weiterhin werden die Konstanten $d, D, k, a$ und $\lambda$ wie folgt definiert:
+
+\begin{align*}
+   d &= 0,3\mu m \\
+   D &= 0,003 \frac{cm^2}{s} \\
+   k_1 &= 10^6 \frac{1}{s} \\
+   k_2 &= 10^{-8} \frac{cm^3}{s} \\
+   N_D &= 10^{15} \frac{1}{cm^3} \\
+   k &= k_1 + k_2 \cdot N_D \\
+   a &= 1 \\
+   \lambda &= 1
+\end{align*}
+
+Nachfolgend muss die erste und zweite Ableitung der Funktion $u(z)$ ermittelt werden, um eine geeignete rechte Seite $s$ zu berechnen:
+
+\begin{align*}
+   u'(z) &= \lambda \cdot a \cdot e^{\lambda z} \\
+   u''(z) &= \lambda^2 \cdot a \cdot e^{\lambda z}
+\end{align*}
+
+Die rechte Seite $s$ ergibt sich zu:
+
+\begin{align*}
+   s = -\left( D \cdot u''(z) - k \cdot u(z) \right)
+\end{align*}
+
+Abschließend berechnen sich die Konstanten $S_L$ und $S_R$ zu:
+
+\begin{align*}
+   S_L &= D \cdot \lambda \\
+   S_R &= -D \cdot \lambda
+\end{align*}
+
+Das Matlab Skript mit den Konstanten kann im beigefügten Ordner unter dem Dokumententitel \texttt{konstanten.m} gefunden werden. \\
+
+\autoref{fig:Aufgabe_2_1_7} zeigt die erfolgreiche Testung der Routine Anhand des Vergleiches zwischen der analytischen Lösung und der der Lösung über die implementierte Routine. Anhand des unterren Abschnittes der Grafik kann festgehalten werden, dass die Lösung über die Routine der realen Lösung annähernd entspricht. Der größe Fehler tritt an den Randstellen auf. \\
+
+Weiterhin zeigt \autoref{fig:Aufgabe_2_1_7_b}, dass der absolute Fehler der Methode mit steigender Anzahl an Teilintervallen $N$ abnimmt. Außerdem kann abgelesen werden, dass es sich um ein Verfahren zweiter Ordnung handelt, da der Fehler um zwei Dekaden sinkt, wenn die Anzahl der Teilintervalle um eine Dekade erhöht wird.
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=0.82\textwidth]{Bilder/Aufgabe_2_1_7.png}
+   \caption[Test der Routine linear stationär]{Vergleich der Analytischen Lösung mit der Lösung über die entwickelte Routine, sowie Darstellung des Fehlers der Lösung mittels der Routine}
+   \label{fig:Aufgabe_2_1_7}
+\end{figure}
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=0.7\textwidth]{Bilder/Aufgabe_2_1_7_b.png}
+   \caption[Ordnung der Methode linear stationär]{Darstellung zur Ermittlung der Ordnung der Methode}
+   \label{fig:Aufgabe_2_1_7_b}
+\end{figure}
+
+Die genutzte Matlab Routine zum Testen der Routine kann unter dem Dokumentennamen \texttt{ordnung\_stationär\_lin.m} gefunden werden im beigefügten Ordner.
 
 \subsubsection{Anwendung der Routine auf spezielle Fälle}
 
+In dieser Teilaufgabe soll mit der entwickelten Routine die Lösung für die Fälle
 
+\begin{align*}
+   s(z) = S_0 \cdot e^{-\alpha z}, \quad S_0 = 10^2, 10^3, 10^4 \frac{1}{\mu m^3 \mu s}
+\end{align*}
+
+berechnet werden. Weiterhin soll ein geeignetes $N$ so bestimmt werden, dass der relative Fehler in $u_i$ maximal 1\textperthousand{} beträgt. \\
+
+Das Ergebnis für die drei Fälle von $S_0$ ist in \autoref{fig:Aufgabe_2_1_8} zu erkennen.
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Bilder/Aufgabe_2_1_8.png}
+   \caption[Lösung von $s(z)$]{Lösung von $s(z)$ für verschiedene $S_0$}
+   \label{fig:Aufgabe_2_1_8}
+\end{figure}
+
+Um ein geeignetes $N$ zu bestimmen, um den realtiven Fehler zu erreichen, wird das $N$ in einer Schleife iterativ erhöht. Dabei wird der Fehler relativ zum vorherigen $N$ berechnet. Das ergebnis dieser Routine wird in \autoref{fig:Aufgabe_2_1_8_b} dargestellt. \\
+Die Routine kann unter dem Dokumentennamen \texttt{exper\_stationär\_lin.m} gefunden werden im beigefügten Ordner. Es kann festgehalten werden, dass das $N$ als 512 gewählt werden muss, um einen relativen Fehler in $u_i$ von maximal 1\textperthousand{} zu erreichen.
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Bilder/Aufgabe_2_1_8_b.png}
+   \caption[Experimentelle Ermittlung von $N$]{Experimentelle Ermittlung von $N$, so dass der relative Fehler in $u_i$ maximal $10^{-3}$ beträgt}
+   \label{fig:Aufgabe_2_1_8_b}
+\end{figure}
+
+\subsection{Nichtlineare stationäre Gleichung}
 
 \clearpage
 
