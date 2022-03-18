@@ -92,6 +92,8 @@
 \usepackage{epstopdf}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{rotating}
+\usepackage{lscape}
 % \captionsetup[subfigure]{list=true, font=normalsize, labelformat=brace, position=top} %setup für subfigure captions
 
 % Diagramm-/Grafikerstellung
@@ -390,7 +392,7 @@ Approximation der 2. Ableitung:
    \frac{\partial^2 u}{\partial z^2} = \frac{u_{i+1}-2\cdot u_i+u_{i-1}}{h^2}
 \end{align*}
 
-Duch das Einsetzen der Approximationen der beiden Ableitungen ergeben sich für $u_i$ mit $i=0, ... ,N$ unter der der Festlegung $s_i = s(z_i)$ und $u_i \approx u(z_i)$ folgende Gleichungen:
+Durch das Einsetzen der Approximationen der beiden Ableitungen ergeben sich für $u_i$ mit $i=0, ... ,N$ unter der der Festlegung $s_i = s(z_i)$ und $u_i \approx u(z_i)$ folgende Gleichungen:
 
 \begin{align*}
    D\cdot \frac{u_1-2\cdot u_0+\textcolor{blue}{u_{-1}}}{h^2} - k\cdot u_0 &= -s_0 \quad mit \quad i = 0 \\
@@ -419,6 +421,17 @@ Einsetzen an den Knoten $z_0$ und $z_N$ ergibt:
 \begin{align*}
    D*\frac{u_1-2u_0-(u'_0\cdot 2h)+u_1}{h^2} - k\cdot u_0 &= -s_0 \quad mit \quad i = 0 \\
    D*\frac{u'_N\cdot 2h+u_{N-1}-2u_N+u_{N-1}}{h^2} - k\cdot u_N &= -s_N \quad mit \quad i = N \\
+\end{align*}
+
+Nun können die Randbedingungen aus \autoref{eq:eq5} nach den 1. Ableitungen umgestellt und eingesetzt werden:
+
+\begin{align*}
+   u'(0) = \frac{S_L \cdot u_0}{D}, \quad u'(N) = \frac{-S_R \cdot u_N}{D}
+\end{align*}
+
+\begin{align*}
+   D*\frac{u_1-2u_0-(\frac{S_L \cdot u_0}{D}\cdot 2h)+u_1}{h^2} - k\cdot u_0 &= -s_0 \quad mit \quad i = 0 \\
+   D*\frac{\frac{-S_R \cdot u_N}{D}\cdot 2h+u_{N-1}-2u_N+u_{N-1}}{h^2} - k\cdot u_N &= -s_N \quad mit \quad i = N \\
 \end{align*}
 
 Die Gleichungen an den Stellen $i=0, i, N$ werden nun vereinfacht bzw. umgeformt:
@@ -470,7 +483,7 @@ Für die Koeffizientenmatrix ergibt sich:
    \end{bmatrix*}
 \end{align*}
 
-\subsubsection{Matlab Routine zum Berechnen der Matrix $A$}
+\subsubsection{Matlab Routine zum Berechnen der Matrix $A$} \label{sec:test_lin}
 
 Die Routine kann unter dem Dokumentennamen \texttt{fd\_lin\_matrix.m} gefunden werden im beigefügten Ordner.
 
@@ -480,7 +493,7 @@ Die Routine kann unter dem Dokumentennamen \texttt{stationär\_lin.m} gefunden w
 
 \subsubsection{Testen der Matlab Routine}
 
-Zum Testen der Routine wir eine Funktion $u(z)$ wie folgt vorgegeben:
+Zum Testen der Routine wird eine Funktion $u(z)$ wie folgt vorgegeben:
 
 \begin{align*}
    u(z) = a \cdot e^{\lambda z}
@@ -521,7 +534,7 @@ Abschließend berechnen sich die Konstanten $S_L$ und $S_R$ zu:
 
 Das Matlab Skript mit den Konstanten kann im beigefügten Ordner unter dem Dokumententitel \texttt{konstanten.m} gefunden werden. \\
 
-\autoref{fig:Aufgabe_2_1_7} zeigt die erfolgreiche Testung der Routine Anhand des Vergleiches zwischen der analytischen Lösung und der der Lösung über die implementierte Routine. Anhand des unterren Abschnittes der Grafik kann festgehalten werden, dass die Lösung über die Routine der realen Lösung annähernd entspricht. Der größe Fehler tritt an den Randstellen auf. \\
+\autoref{fig:Aufgabe_2_1_7} zeigt die erfolgreiche Testung der Routine Anhand des Vergleiches zwischen der analytischen Lösung und der der Lösung über die implementierte Routine. Anhand des unteren Abschnittes der Grafik kann festgehalten werden, dass die Lösung über die Routine der realen Lösung annähernd entspricht. Der größe Fehler tritt an den Randstellen auf. \\
 
 Weiterhin zeigt \autoref{fig:Aufgabe_2_1_7_b}, dass der absolute Fehler der Methode mit steigender Anzahl an Teilintervallen $N$ abnimmt. Außerdem kann abgelesen werden, dass es sich um ein Verfahren zweiter Ordnung handelt, da der Fehler um zwei Dekaden sinkt, wenn die Anzahl der Teilintervalle um eine Dekade erhöht wird.
 
@@ -571,6 +584,228 @@ Die Routine kann unter dem Dokumentennamen \texttt{exper\_stationär\_lin.m} gef
 \end{figure}
 
 \subsection{Nichtlineare stationäre Gleichung}
+
+Im zweiten Schritt soll nun die volle nichtlineare Gleichung \autoref{eq:eq4} mit Randbedingung \autoref{eq:eq5} gelöst werden. Analog zum letzten Abschnitt wird ein nichtlineares Gleichungssystem aufgestellt, das mithilfe des Newton-Verfahrens aus der Belegarbeit gelöst werden soll.
+
+\subsubsection{Herleitung der nichtlinearen Gleichungen für die gesuchten Werte $u_0, ... , u_{N}$} \label{sec:nichtlineare_gleichungen}
+
+Die nichtlinearen Gleichungen sollen in der Form
+
+\begin{align}
+   \label{eq:eq8}
+   F(u) = b
+\end{align}
+
+dargestellt werden. Wie auch schon im linearen Fall werden die Randbedingungen berücksichtigt. \\
+
+Zunächst werden wieder die Approximationen der 1. und 2. Ableitung aufgestellt. \\
+
+Approximation der 1. Ableitung:
+
+\begin{align*}
+   \frac{\partial u}{\partial z} = \frac{u_{i+1}-u_{i-1}}{2h}
+\end{align*}
+
+Approximation der 2. Ableitung:
+
+\begin{align*}
+   \frac{\partial^2 u}{\partial z^2} = \frac{u_{i+1}-2\cdot u_i+u_{i-1}}{h^2}
+\end{align*}
+
+Durch das Einsetzen der Approximationen der beiden Ableitungen ergeben sich für $u_i$ mit $i=0, ... ,N$ unter der der Festlegung $s_i = s(z_i)$ und $u_i \approx u(z_i)$ folgende Gleichungen:
+
+\begin{align*}
+   D\cdot \frac{u_1-2\cdot u_0+\textcolor{blue}{u_{-1}}}{h^2} - k\cdot u_0 -k_2\cdot u_0^2 &= -s_0 \quad mit \quad i = 0 \\
+   D\cdot \frac{u_{i+1}-2\cdot u_i+u_{i-1}}{h^2} - k\cdot u_i -k_2\cdot u_0^2 &= -s_i \\
+   D\cdot \frac{\textcolor{blue}{u_{N+1}}-2\cdot u_N+u_{N-1}}{h^2} - k\cdot u_N -k_2\cdot u_0^2 &= -s_N \quad mit \quad i = N \\
+   mit \quad k = k_1+k_2\cdot N_D
+\end{align*}
+
+Anschließend werden die ersten Ableitungen an den Randbedingungen (\autoref{eq:eq5}) approximiert durch:
+
+\begin{align*}
+   u'(0) \approx \frac{u_1-u_{-1}}{2h}, \quad u'(d) \approx \frac{u_{N+1}-u_{N-1}}{2h}
+\end{align*}
+
+Durch das Auflösen nach $u_{-1}$ bzw. $u_{N+1}$ ergibt sich:
+
+\begin{align*}
+   u_{-1} = -(u'(0)\cdot 2h) + u_1, \quad u_{N+1} = u'(d)\cdot 2h + u_{N-1}
+\end{align*}
+
+Einsetzen an den Knoten $z_0$ und $z_N$ ergibt:
+
+\begin{align*}
+   D*\frac{u_1-2u_0-(u'_0\cdot 2h)+u_1}{h^2} - k\cdot u_0 -k_2\cdot u_0^2 &= -s_0 \quad mit \quad i = 0 \\
+   D*\frac{u'_N\cdot 2h+u_{N-1}-2u_N+u_{N-1}}{h^2} - k\cdot u_N -k_2\cdot u_0^2 &= -s_N \quad mit \quad i = N \\
+\end{align*}
+
+Nun können die Randbedingungen aus \autoref{eq:eq5} nach den 1. Ableitungen umgestellt und eingesetzt werden:
+
+\begin{align*}
+   u'(0) = \frac{S_L \cdot u_0}{D}, \quad u'(N) = \frac{-S_R \cdot u_N}{D}
+\end{align*}
+
+\begin{align*}
+   D*\frac{u_1-2u_0-(\frac{S_L \cdot u_0}{D}\cdot 2h)+u_1}{h^2} - k\cdot u_0 -k_2\cdot u_0^2 &= -s_0 \quad mit \quad i = 0 \\
+   D*\frac{\frac{-S_R \cdot u_N}{D}\cdot 2h+u_{N-1}-2u_N+u_{N-1}}{h^2} - k\cdot u_N -k_2\cdot u_0^2 &= -s_N \quad mit \quad i = N \\
+\end{align*}
+
+Die Gleichungen an den Stellen $i=0, i, N$ werden nun vereinfacht bzw. umgeformt:
+
+\begin{align*}
+   \frac{D}{h^2}\cdot \left[ \textcolor{green}{2}u_1-\left( \textcolor{green}{\frac{2D+S_L\cdot 2h+h^2k}{D}+\frac{h^2\cdot k_2}{D}\cdot u_0}\right) \cdot u_0\right] &= -s_0 \quad mit \quad i = 0 \\
+   \frac{D}{h^2}\cdot \left[ \textcolor{green}{1}u_{i+1}-\left( \textcolor{green}{\frac{2D+h^2k}{D}+\frac{h^2\cdot k_2}{D}\cdot u_i}\right) \cdot u_i+\textcolor{green}{1}u_{i-1}\right] &= -s_i \\
+   \frac{D}{h^2}\cdot \left[ \left( \textcolor{green}{\frac{-S_R\cdot 2h-2D-h^2k}{D}-\frac{h^2\cdot k_2}{D}\cdot u_N}\right) \cdot u_N+\textcolor{green}{2}u_{N-1}\right] &= -s_N \quad mit \quad i = N \\
+\end{align*}
+
+Die grün makierten Terme werden später für die Jacobi-Matrix benötigt.\\
+
+Abschließend können die Gleichungen in der Form wie in \autoref{eq:eq8} gefordert dargestellt werden:
+
+\begin{align*}
+   \begin{bmatrix*}
+      F_0 \\
+      \vdots \\
+      F_i \\
+      \vdots \\
+      F_{N}
+   \end{bmatrix*}
+   &=\frac{D}{h^2}\cdot
+   \begin{bmatrix*}
+      -\left( \frac{2D+S_L\cdot 2h+h^2k}{D}+\frac{h^2\cdot k_2}{D}\cdot u_0\right) \cdot u_0 + 2u_1 \\
+      \vdots \\
+      u_{i-1}-\left( \frac{2D+h^2k}{D}+\frac{h^2\cdot k_2}{D}\cdot u_i\right) \cdot u_i+u_{i+1} \\
+      \vdots \\
+      2u_{N-1} + \left( \frac{-S_R\cdot 2h-2D-h^2k}{D}-\frac{h^2\cdot k_2}{D}\cdot u_N\right) \cdot u_N
+   \end{bmatrix*}
+   \\
+   &= -
+   \begin{bmatrix*}
+      s_0 \\
+      \vdots \\
+      s_i \\
+      \vdots \\
+      s_N
+   \end{bmatrix*}
+\end{align*}
+
+\subsubsection{Matlab Routine zur Berechnung von $F$ der letztem Teilaufgabe}
+
+Die Routine kann unter dem Dokumentennamen \texttt{fd\_nonlin.m} gefunden werden im beigefügten Ordner.
+
+\subsubsection{Berechnung der Jacobi-Matrix $DF$ von $F$ bezüglich $u$}
+
+Allgemein kann die Jacobi-Matrix $DF$ von $F$ bezüglich $u$ wie folgt dargestellt werden:
+
+\begin{align*}
+   DF(u) &=
+   \begin{bmatrix*}
+      \frac{\partial F_0(u)}{\partial u_0} & \hdots & \frac{\partial F_0(u)}{\partial u_i} & \hdots & \frac{\partial F_0(u)}{\partial u_{N}} \\
+      \vdots & & \vdots & & \vdots \\
+      \frac{\partial F_i(u)}{\partial u_0} & \hdots & \frac{\partial F_i(u)}{\partial u_i} & \hdots & \frac{\partial F_i(u)}{\partial u_{N}} \\
+      \vdots & & \vdots & & \vdots \\
+      \frac{\partial F_N(u)}{\partial u_0} & \hdots & \frac{\partial F_N(u)}{\partial u_i} & \hdots & \frac{\partial F_N(u)}{\partial u_{N}}
+   \end{bmatrix*}
+\end{align*}
+
+\clearpage
+
+\begin{landscape}
+
+Mit Hilfe der grün makierten Terme aus \autoref{sec:nichtlineare_gleichungen} kann nun die konkrete Jacobi-Matrix $DF$ aufgestellt werden.
+
+\begin{align*}
+   & DF(u) = \frac{D}{h^2}\cdot \\
+   &
+   \begin{bmatrix*}
+      -\left( \frac{2D+S_L\cdot 2h+h^2k}{D}+\frac{h^2\cdot k_2}{D}\cdot u_0\right)  & 2 \\
+                     1                                                              & -\left( \frac{2D+h^2k}{D}+\frac{h^2\cdot k_2}{D}\cdot u_i\right)   & 1 \\
+                                                                                    & \ddots                                                             & \ddots & \ddots \\
+                                                                                                                                                         &        & 1   & -\left( \frac{2D+h^2k}{D}+\frac{h^2\cdot k_2}{D}\cdot u_i\right)   & 1 \\
+                                                                                                                                                         &        &     & 2                                                                  & \left( \frac{-S_R\cdot 2h-2D-h^2k}{D}-\frac{h^2\cdot k_2}{D}\cdot u_N\right)
+   \end{bmatrix*}
+\end{align*}
+
+\end{landscape}
+
+\clearpage
+
+\subsubsection{Matlab Routine zur Berechnung von $DF$ der letztem Teilaufgabe}
+
+Die Routine kann unter dem Dokumentennamen \texttt{fd\_nonlin\_jac.m} gefunden werden im beigefügten Ordner.
+
+\subsubsection{Matlab Routine zur Lösung des Gleichungssystems (\autoref{eq:eq8})}
+
+Über die \textit{Deal}-Funktion von Matlab kann ein Funktionshandle mit den Routinen für $F$ und $DF$ erstellt werden.\\
+Als Startwert dient ein Spaltenvekor mit $N+1$ Zeilen die jeweils eine $0$ enthalten.\\
+Das Newton-Verfahren zum Lösen Gleichungssystems bekommt den Funktionshandle $f(u)$, den Startwert, die geforderte Toleranz und die maximale anzahl an Schritten übergeben.\\
+Die Routine kann unter dem Dokumentennamen \texttt{stationaer\_nonlin.m} gefunden werden im beigefügten Ordner.
+
+\subsubsection{Testen der Matlab Routine}
+
+Zum Testen der Routine wird eine Funktion $u(z)$ wie auch schon in \autoref{sec:test_lin} vorgegeben:
+
+\begin{align*}
+   u(z) = a \cdot e^{\lambda z}
+\end{align*}
+
+Weiterhin werden die Konstanten $d, D, k, a$ und $\lambda$ wie folgt definiert:
+
+\begin{align*}
+   d &= 0,3\mu m \\
+   D &= 0,003 \frac{cm^2}{s} \\
+   k_1 &= 10^6 \frac{1}{s} \\
+   k_2 &= 10^{-8} \frac{cm^3}{s} \\
+   N_D &= 10^{15} \frac{1}{cm^3} \\
+   k &= k_1 + k_2 \cdot N_D \\
+   a &= 1 \\
+   \lambda &= 1
+\end{align*}
+
+Nachfolgend muss die erste und zweite Ableitung der Funktion $u(z)$ ermittelt werden, um eine geeignete rechte Seite $s$ zu berechnen:
+
+\begin{align*}
+   u'(z) &= \lambda \cdot a \cdot e^{\lambda z} \\
+   u''(z) &= \lambda^2 \cdot a \cdot e^{\lambda z}
+\end{align*}
+
+Die rechte Seite $s$ ergibt sich zu:
+
+\begin{align*}
+   s = -\left( D \cdot u''(z) - k \cdot u(z) - k_2 \cdot u(z)^2 \right)
+\end{align*}
+
+Abschließend berechnen sich die Konstanten $S_L$ und $S_R$ zu:
+
+\begin{align*}
+   S_L &= D \cdot \lambda \\
+   S_R &= -D \cdot \lambda
+\end{align*}
+
+Das Matlab Skript mit den Konstanten kann im beigefügten Ordner unter dem Dokumententitel \texttt{konstanten.m} gefunden werden. \\
+
+\autoref{fig:Aufgabe_2_2_6} zeigt die erfolgreiche Testung der Routine Anhand des Vergleiches zwischen der analytischen Lösung und der der Lösung über die implementierte Routine. Anhand des unteren Abschnittes der Grafik kann festgehalten werden, dass die Lösung über die Routine der realen Lösung annähernd entspricht. Der größe Fehler tritt an den Randstellen auf. \\
+
+Weiterhin zeigt \autoref{fig:Aufgabe_2_2_6_b}, dass der absolute Fehler der Methode mit steigender Anzahl an Teilintervallen $N$ abnimmt. Außerdem kann abgelesen werden, dass es sich um ein Verfahren zweiter Ordnung handelt, da der Fehler um zwei Dekaden sinkt, wenn die Anzahl der Teilintervalle um eine Dekade erhöht wird.
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=0.82\textwidth]{Bilder/Aufgabe_2_2_6.png}
+   \caption[Test der Routine nichtlinear stationär]{Vergleich der Analytischen Lösung mit der Lösung über die entwickelte Routine, sowie Darstellung des Fehlers der Lösung mittels der Routine}
+   \label{fig:Aufgabe_2_2_6}
+\end{figure}
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=0.7\textwidth]{Bilder/Aufgabe_2_2_6_b.png}
+   \caption[Ordnung der Methode nichtlinear stationär]{Darstellung zur Ermittlung der Ordnung der Methode}
+   \label{fig:Aufgabe_2_2_6_b}
+\end{figure}
+
+Die genutzte Matlab Routine zum Testen der Routine kann unter dem Dokumentennamen \texttt{ordnung\_stationär\_nonlin.m} gefunden werden im beigefügten Ordner.
+
+\subsubsection{Anwendung der Routine auf spezielle Fälle}
 
 \clearpage
 

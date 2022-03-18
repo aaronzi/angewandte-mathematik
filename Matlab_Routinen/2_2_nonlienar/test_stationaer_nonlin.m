@@ -23,11 +23,15 @@ function maxerr = test_stationaer_nonlin(N)
     subplot(2,1,1);
     plot(z,u,'o-',z,ue, 'Linewidth', 3, 'Markersize', 8)
     legend('FD Lösung', 'Analytisch')
-    title('Verhalten')
+    xlabel('z [um]');
+    ylabel('u [1]');
+    title('Ladungsträgerdichte')
     
     subplot(2,1,2);
     plot(z,err,'-')
-    title('Fehler')
+    xlabel('z [um]');
+    ylabel('abs. Fehler [1]');
+    title('Fehler');
     
     maxerr = max(err);
 end
