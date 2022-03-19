@@ -851,6 +851,7 @@ Steife Systeme treten aber auch in der Modellierung von Reaktionen in der Chemie
 Die Dynamik der Konzentrationen der einzelnen Komponenten können durch Anfangswertproblem
 
 \begin{align}
+   \label{eq:eq9}
    \begin{matrix*}
       A: & y'_1 & = & -0.04y_1   & +10^4y_2y_3                       \\
       B: & y'_2 & = & +0.04y_1   & -10^4y_2y_3  & -3 \cdot 10^7y_2^2 \\
@@ -1098,9 +1099,107 @@ Das Matlab-Sckript mit dem Test der Routine kann unter dem Dokumentennamen \text
 
 \subsection{Anwendung}
 
+In diesem Abschnitt sollen die entwickelten Löser auf das Modell der chemischen Reaktion angewandt werden. Dabei wird wie folgt vorgegangen:
+
+\subsubsection{\autoref{eq:eq9} als System der Form (\ref{eq:eq11}) mit Funktion $f_{chem}(t,y)$}
+
+\begin{align*}
+   y' = f_{chem}(t,y) &=
+   \begin{bmatrix*}
+      -0.04y_1+10^4y_2y_3 \\
+      0.04y_1-10^4y_2y_3-3\cdot 10^7y_2^2 \\
+      3\cdot 10^7y_2^2
+   \end{bmatrix*} \\
+   mit \quad t &\in [0,\backsim ] \\
+   y(a) = y_a &=
+   \begin{bmatrix*}
+      1 \\
+      0 \\
+      0
+   \end{bmatrix*}
+\end{align*}
+
+\subsubsection{Matlab Routine für die chemische Reaktion}
+
+Die implementierte Matlab Routine kann unter dem Dokumentennamen \texttt{f\_chem.m} gefunden werden im beigefügten Ordner.
+
+\subsubsection{Jacobi-Matrix $Dyf_{chem}(t,y)$ von $f_{chem}$ bezüglich $y$}
+
+\begin{align*}
+   Dyf_{chem}(t,y) =
+   \begin{bmatrix*}
+      -0.04 & 10^4y_3 & 10^4y_2 \\
+      0.04 & -10^4y_3-6\cdot 10^7y_2 & -10^4y_2 \\
+      0 & 6\cdot 10^7y_2 & 0
+   \end{bmatrix*}
+\end{align*}
+
+\subsubsection{Jacobi-Matrix $Df_{chem}(t,y)$ als Matlab Routine}
+
+Die implementierte Matlab Routine kann unter dem Dokumentennamen \texttt{f\_chem\_jac.m} gefunden werden im beigefügten Ordner.
+
+\subsubsection{Lösung des Anfangswertproblemes mit verschiedenen Integratoren}
+
+\autoref{fig:Aufgabe_3_2_5} zeigt Beispielhaft die Lösung des Anfangswertproblemes auf dem Intervall $[0,1]$ mit der impliziten Trapezregel.
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=0.9\textwidth]{Bilder/Aufgabe_3_2_5.png}
+   \caption[Lösung des Anfangswertproblemes]{Grafische Darstellung der Lösung des Anfangswertproblemes mit den verschiedenen Integratoren am Beispiel der impliziten Trapezregel}
+   \label{fig:Aufgabe_3_2_5}
+\end{figure}
+
+Mit der Matlab Routine unter dem Dokumentennamen \texttt{exper\_chem.m} wurde experimentell für die vier umgesetzten Integratoren (Expliziter Euler, Mitelpunktsregel, Impliziter Euler, Implizite Trapezregel) ein geeignetes $n$ so bestimmt, dass der absolute Fehler jeder einzelnen Komponente und Zeitschritts höchstens $10^{-4}$ bzw. $10^{-6}$ beträgt.
+
+\autoref{tab:tab_zehn_hoch_minus_4} und \autoref{tab:tab_zehn_hoch_minus_6} zeigen die Ergebnisse der experimentellen Berechnungen.
+
+\begin{table}[H]
+   \centering
+   \resizebox{\textwidth}{!}{%
+      \begin{tabular}{l|l|l|l|l}
+      Verfahren             & $n$    & abs. Fehler in $y_1$   & abs. Fehler in $y_2$   & abs. Fehler in $y_3$   \\ \hline
+      Expliziter Euler      & $2048$ & $0.1191 \cdot 10^{-5}$ & $0.0000 \cdot 10^{-5}$ & $0.1191 \cdot 10^{-5}$ \\ \hline
+      Mittelpunktsregel     & $2048$ & $0.2961 \cdot 10^{-5}$ & $0.3075 \cdot 10^{-5}$ & $0.0114 \cdot 10^{-5}$ \\ \hline
+      Impliziter Euler      & $32$   & $0.7404 \cdot 10^{-4}$ & $0.0001 \cdot 10^{-4}$ & $0.7406 \cdot 10^{-4}$ \\ \hline
+      Implizite Trapezregel & $32$   & $0.7960 \cdot 10^{-4}$ & $0.0263 \cdot 10^{-4}$ & $0.7707 \cdot 10^{-4}$
+      \end{tabular}%
+   }
+   \caption[$n$-Bestimmung bei max. abs. Fehler von $10^{-4}$]{Experimentelle Bestimmung von $n$ bei einem maximalen Fehler von $10^{-4}$}
+   \label{tab:tab_zehn_hoch_minus_4}
+\end{table}
+
+\begin{table}[H]
+   \centering
+   \resizebox{\textwidth}{!}{%
+      \begin{tabular}{l|l|l|l|l}
+      Verfahren             & $n$      & abs. Fehler in $y_1$   & abs. Fehler in $y_2$   & abs. Fehler in $y_3$   \\ \hline
+      Expliziter Euler      & $8192$   & $0.2978 \cdot 10^{-6}$ & $0.0000 \cdot 10^{-6}$ & $0.2978 \cdot 10^{-6}$ \\ \hline
+      Mittelpunktsregel     & $16384$  & $0.3852 \cdot 10^{-6}$ & $0.4262 \cdot 10^{-6}$ & $0.0411 \cdot 10^{-6}$ \\ \hline
+      Impliziter Euler      & $4096$   & $0.5954 \cdot 10^{-6}$ & $0.0001 \cdot 10^{-6}$ & $0.5955 \cdot 10^{-6}$ \\ \hline
+      Implizite Trapezregel & $1024$   & $0.4012 \cdot 10^{-9}$ & $0.0001 \cdot 10^{-9}$ & $0.4012 \cdot 10^{-9}$
+      \end{tabular}%
+   }
+   \caption[$n$-Bestimmung bei max. abs. Fehler von $10^{-6}$]{Experimentelle Bestimmung von $n$ bei einem maximalen Fehler von $10^{-6}$}
+   \label{tab:tab_zehn_hoch_minus_6}
+\end{table}
+
+\subsubsection{Diskussion der Performanz}
+
+Vor allem an \autoref{tab:tab_zehn_hoch_minus_6} it gut zu erkennen, dass das explizite Euler-Verfahren ein kleineres $n$  benötigt, um einen vergleichbaren Fehler zur Mittelpunktsregel zu erreichen. \\
+Ähnliches kann auch im Vegleich der beiden impliziten Verfahren festgestellt werden. Die implizite Trapezregel benötigt ein kleineres $n$ um einen vergleichbaren Fehler zum impliziten Euler-Verfahren zu erreichen. \\
+Weiterhin kann festgehalten werden, dass die impliziten Verfahren ein deutlich geringeres $n$ für einen vergleichbaren Fehler benötigen. Daraus kann für die Performanz der Routinen die Aussage getroffen werden, dass die impliziten Verfahren eine bessere Performanz haben als die expliziten Verfahren.
+
 \clearpage
 
 \section{Zeitaufgelöste Simulation} \label{sec:ZeitaufgeloesteSimulation}
+
+\subsection{Formulierung der Differenzialgleichung als System}
+
+\subsection{Matlab Routine zur Berechnung von $F(t,u)$ und $D_uF(t,u)$}
+
+\subsection{Simulation des Systems}
+
+\subsection{Grafische Darstellung der Ergebnisse}
 
 \clearpage
 
