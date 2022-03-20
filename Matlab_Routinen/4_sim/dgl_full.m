@@ -18,4 +18,9 @@ y2s = y2(1:1:end, 1:2:end);
 disp(norm(y(:)-y2s(:),inf)/norm(y2s(:),inf))
 
 % Plot
+figure
 mesh(y)
+grid on
+xlabel('Halbleiterdicke z[um]');
+ylabel('Zeit t[us]');
+zlabel('Ladungsträgerdichte u[1]');

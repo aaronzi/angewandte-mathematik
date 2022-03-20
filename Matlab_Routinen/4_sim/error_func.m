@@ -1,6 +1,6 @@
 function [t,y] = error_func(nTime,nLocation)
     c = konstanten();
-    s0 = 1e2;
+    s0 = 1e6;
     tspan = [-0.05,0.2];
     tol = 1e-6;
     nmax = 12;

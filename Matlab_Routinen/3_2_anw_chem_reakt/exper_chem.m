@@ -1,3 +1,4 @@
+%% Meins
 tspan = [0,1];
 ya = [1; 0; 0];
 
@@ -62,6 +63,4 @@ for i=1:length(n)-1
         break;
     end
 end
-
-% [t_trap_impl,y_trap_impl]=impl_trapez(@f_chem,tspan,ya,n,@f_chem_jac,tol,nmax);
 

@@ -1187,19 +1187,145 @@ Mit der Matlab Routine unter dem Dokumentennamen \texttt{exper\_chem.m} wurde ex
 
 Vor allem an \autoref{tab:tab_zehn_hoch_minus_6} it gut zu erkennen, dass das explizite Euler-Verfahren ein kleineres $n$  benötigt, um einen vergleichbaren Fehler zur Mittelpunktsregel zu erreichen. \\
 Ähnliches kann auch im Vegleich der beiden impliziten Verfahren festgestellt werden. Die implizite Trapezregel benötigt ein kleineres $n$ um einen vergleichbaren Fehler zum impliziten Euler-Verfahren zu erreichen. \\
-Weiterhin kann festgehalten werden, dass die impliziten Verfahren ein deutlich geringeres $n$ für einen vergleichbaren Fehler benötigen. Daraus kann für die Performanz der Routinen die Aussage getroffen werden, dass die impliziten Verfahren eine bessere Performanz haben als die expliziten Verfahren.
+Weiterhin kann festgehalten werden, dass die impliziten Verfahren ein deutlich geringeres $n$ für einen vergleichbaren Fehler benötigen. Daraus kann für die Performanz der Routinen die Aussage getroffen werden, dass die impliziten Verfahren eine bessere Performanz haben als die expliziten Verfahren.\\
+
+Die vier implementierten Löser können unter den Dokumentennamen \texttt{euler\_systeme.m}, \texttt{mittelpunktsregel\_systeme.m}, \texttt{impl\_euler.m} und \texttt{impl\_trapezregel.m} im beigefügten Ordner gefunden werden. Das Matlab File mit der experimentellen Ermittlung des $n$ ist unter dem Dokumentennamen \texttt{exper\_chem.m} zu finden.
 
 \clearpage
 
 \section{Zeitaufgelöste Simulation} \label{sec:ZeitaufgeloesteSimulation}
 
+In diesem Abschnitt werden die entwickelten Methoden kombiniert, um die ursprüngliche \autoref{eq:eq1} zu lösen. Dazu wird diese Gleichung an den Knotenpunkten $z_0, ... ,z_N$ aus \autoref{sec:FiniteDifferenzen} ausgewertet und man erhält
+
+\begin{align*}
+   \frac{\partial u}{\partial t}(t,z_i) = D\frac{\partial ^2u}{\partial z^2}(t,z_i) - (k_1 + k_2N_D)u(t,z_i) - k_2u^2(t,z_i) + s(t,z_i), \quad t \geq t_0,i = 0,1,...,N
+\end{align*}
+
+Wie bei den finiten Differenzen setzen wir
+
+\begin{align*}
+   u_i(t) = u(t,z_i)
+\end{align*}
+
+und approximieren die rechte Seite durch finite Differenzen wie in \autoref{sec:FiniteDifferenzen}. Wir erhalten somit ein System von Anfangswertproblemen für die Funktionen $u_i(t), \quad i = 0,...,N$. Es wird wie folgt vorgegangen.
+
 \subsection{Formulierung der Differenzialgleichung als System}
+
+Das System soll in der Form 
+
+\begin{align}
+   \label{eq:eq8}
+   u' = F(t,u)
+\end{align}
+
+dargestellt werden. Wie auch schon in \autoref{sec:FiniteDifferenzen} werden die Randbedingungen  aus \autoref{eq:eq5} berücksichtigt. \\
+
+weiterhin gilt:
+
+\begin{align*}
+   k = k_1+k_2\cdot N_D \\
+   s_i = s(z_i) \\
+   h = \frac{d}{N} \\
+   u_i \approx u(i)
+\end{align*}
+
+Anolog werden die 1. und 2. Ableitung approximiert zu:
+
+\begin{align*}
+   u' = \frac{u_{i+1}-u_{i-1}}{2h}, \quad u'' = \frac{u_{i+1}-2u_{i}+u_{i-1}}{h^2}
+\end{align*}
+
+Durch das Einsetzen der Approximationen der beiden Ableitungen ergeben sich für $u_i$ mit $i=0, ... ,N$ unter der der Festlegung $s_i = s(z_i)$ und $u_i \approx u(z_i)$ folgende Gleichungen:
+
+\begin{align*}
+   u_0' &= D\cdot \frac{u_1-2\cdot u_0+\textcolor{blue}{u_{-1}}}{h^2} - k\cdot u_0 -k_2\cdot u_0^2 + s_0 \quad mit \quad i = 0 \\
+   u_i' &= D\cdot \frac{u_{i+1}-2\cdot u_i+u_{i-1}}{h^2} - k\cdot u_i -k_2\cdot u_0^2 + s_i \\
+   u_N' &= D\cdot \frac{\textcolor{blue}{u_{N+1}}-2\cdot u_N+u_{N-1}}{h^2} - k\cdot u_N -k_2\cdot u_0^2 + s_N \quad mit \quad i = N \\
+\end{align*}
+
+Anschließend werden die ersten Ableitungen an den Randbedingungen (\autoref{eq:eq5}) approximiert durch:
+
+\begin{align*}
+   u'(0) \approx \frac{u_1-u_{-1}}{2h}, \quad u'(d) \approx \frac{u_{N+1}-u_{N-1}}{2h}
+\end{align*}
+
+Durch das Auflösen nach $u_{-1}$ bzw. $u_{N+1}$ ergibt sich:
+
+\begin{align*}
+   u_{-1} = -(u'(0)\cdot 2h) + u_1, \quad u_{N+1} = u'(d)\cdot 2h + u_{N-1}
+\end{align*}
+
+Einsetzen an den Knoten $z_0$ und $z_N$ ergibt:
+
+\begin{align*}
+   u_0' &= D*\frac{u_1-2u_0-(u'_0\cdot 2h)+u_1}{h^2} - k\cdot u_0 -k_2\cdot u_0^2 + s_0 \quad mit \quad i = 0 \\
+   u_N' &= D*\frac{u'_N\cdot 2h+u_{N-1}-2u_N+u_{N-1}}{h^2} - k\cdot u_N -k_2\cdot u_0^2 + s_N \quad mit \quad i = N \\
+\end{align*}
+
+Nun können die Randbedingungen aus \autoref{eq:eq5} nach den 1. Ableitungen umgestellt und eingesetzt werden:
+
+\begin{align*}
+   u'(0) = \frac{S_L \cdot u_0}{D}, \quad u'(N) = \frac{-S_R \cdot u_N}{D}
+\end{align*}
+
+\begin{align*}
+   u_0' &= D*\frac{u_1-2u_0-(\frac{S_L \cdot u_0}{D}\cdot 2h)+u_1}{h^2} - k\cdot u_0 -k_2\cdot u_0^2 + s_0 \quad mit \quad i = 0 \\
+   u_N' &= D*\frac{\frac{-S_R \cdot u_N}{D}\cdot 2h+u_{N-1}-2u_N+u_{N-1}}{h^2} - k\cdot u_N -k_2\cdot u_0^2 + s_N \quad mit \quad i = N \\
+\end{align*}
+
+Die Gleichungen an den Stellen $i=0, i, N$ werden nun vereinfacht bzw. umgeformt und in die Form $u' = F(t,u)$ überführt:
+
+\begin{align*}
+   F(t,u) =
+   \begin{bmatrix}
+      \frac{D}{h^2}\cdot \left[ 2u_1-\left( \frac{2D+S_L\cdot 2h+h^2k}{D}+\frac{h^2\cdot k_2}{D}\cdot u_0\right) \cdot u_0\right] + s_0 \\
+      \vdots \\
+      \frac{D}{h^2}\cdot \left[ u_{i+1}-\left( \frac{2D+h^2k}{D}+\frac{h^2\cdot k_2}{D}\cdot u_i\right) \cdot u_i+u_{i-1}\right] + s_i \\
+      \vdots \\
+      \frac{D}{h^2}\cdot \left[ \left( \frac{-S_R\cdot 2h-2D-h^2k}{D}-\frac{h^2\cdot k_2}{D}\cdot u_N\right) \cdot u_N+2u_{N-1}\right] + s_N \\
+   \end{bmatrix}
+\end{align*}
 
 \subsection{Matlab Routine zur Berechnung von $F(t,u)$ und $D_uF(t,u)$}
 
+Die beiden Routinen können unter den Dokumentennamen \texttt{fd\_nonlin.m} und \texttt{fd\_nonlin\_jac.m} gefunden werden im beigefügten Ordner.
+
 \subsection{Simulation des Systems}
 
+Der Aufruf der Trapezregel für die Funktion
+
+\begin{align*}
+   s(t,z) = S_0 \cdot e^{-\frac{t^2}{2 \cdot 0.01^2}} \cdot e^{- \alpha z}
+\end{align*}
+
+kann im beigefügten Ordner unter dem Dokumententitel \texttt{error\_func.m} gefunden werden. Dort wird auch der Wert für $S_0$ vorgegeben, sowei alle weiteren Konstatentn und Parameter. \\
+
+Die Vorgabe der Zeit- und Ortsschritte erfolgt in der Matlab Routine unter dem Dokumenmtennamen \texttt{dgl\_full.m}, in welcher auch die zuvor genannte Routine aufgerufen wird.
+
 \subsection{Grafische Darstellung der Ergebnisse}
+
+\autoref{fig:Aufgabe_4_4_4}, \autoref{fig:Aufgabe_4_4_5} und \autoref{fig:Aufgabe_4_4_6} zeigen die Ergebnisse der Simulation bei verschiedenen $S_0$. Die Ergebnisse sind in der Form einer Zeit- und Ortsplots dargestellt (Matlab \texttt{mesh}-Befehl). Es ist zu erkennen, dass je Größer das $S_0$ gewählt wird, umso größer ist auch die Ladungsträgerdichte zum Startzeitpunkt. Die zeitlichen und örtlichen Eigenschaften bleiben von $S_0$ unbeeinflusst.
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Bilder/Aufgabe_4_4_4.png}
+   \caption[Lösung bei $S_0 = 10^4$]{Grafische Darstellung der Zeitaufgelösten Simulation bei $S_0 = 10^4$}
+   \label{fig:Aufgabe_4_4_4}
+\end{figure}
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Bilder/Aufgabe_4_4_5.png}
+   \caption[Lösung bei $S_0 = 10^5$]{Grafische Darstellung der Zeitaufgelösten Simulation bei $S_0 = 10^5$}
+   \label{fig:Aufgabe_4_4_5}
+\end{figure}
+
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=1\textwidth]{Bilder/Aufgabe_4_4_6.png}
+   \caption[Lösung bei $S_0 = 10^6$]{Grafische Darstellung der Zeitaufgelösten Simulation bei $S_0 = 10^6$}
+   \label{fig:Aufgabe_4_4_6}
+\end{figure}
 
 \clearpage
 
